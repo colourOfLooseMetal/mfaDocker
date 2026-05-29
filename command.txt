@@ -1,0 +1,5 @@
+mfa model download acoustic english_mfa
+
+mfa model download dictionary english_us_mfa
+
+mfa align /data english_us_mfa english_mfa /data/output --output_format json
