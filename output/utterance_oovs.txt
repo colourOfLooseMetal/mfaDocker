@@ -1,5 +1,137 @@
-s01e05, Season1: 0.0-1379.392: a, p, p, e, t, i, z, e, r, s,  , c, e, n, t, r, a, x,  , c, o, s, t, a, n, z, a,  , e, h, h,  , f, a, u, c, e, t, s,  , f, l, u, c, t, u, a, t, e, s,  , k, s, h,  , m, u, t, a, t, e, s,  , p, s, s, t,  , s, h, h,  , t, e, l, e, v, i, s, i, n, g,  , t, e, r, r, o, r, i, z, e, d,  , t, o, o, t, h, b, r, u, s, h, e, s,  , t, r, a, m, c, o,  , v, v, v, v, t,  , w, i, l, k, e, n, s, o, n
-s01e02, Season1: 0.0-1380.2666875: b, e, n, e, s,  , b, e, n, n, e, s,  , b, i, n, s, o, n,  , b, o, u, i, l, l, a, b, a, i, s, s, e,  , b, r, i, c, k, e, r,  , c, h, e, c, k, b, o, o, k,  , c, o, r, e, v, e, l, a, y,  , f, o, r, n, i, c, a, t, o, r,  , h, a, r,  , h, a, r, b, i, n, s, o, n,  , l, e, v, e, e, n,  , l, o, n, i,  , m, e, i, n,  , m, e, l, l, e, n, c, a, m, p,  , m, o, r, t, y,  , o, p, p, e, n,  , q, u, o, n, e,  , r, i, c, o, n, i, c,  , s, a, g, m, a, n,  , s, t, a, k, e, o, u, t,  , v, a, n, d, e, l, a, y,  , v, e, l, a, y
-s01e03, Season1: 0.0-1381.184: b, a, r, b, e, c, u, i, n, g,  , b, e, n, e, s,  , b, r, i, s, k, e, t,  , c, l, a, p, c, o,  , h, m, m,  , h, o, u, s, e, w, a, r, m, i, n, g, s,  , j, e, r,  , l, e, f, t, o, v, e, r, s,  , m, a, n, h, u, n, t, s,  , m, a, s, s, e, u, s, e,  , m, e, r, m, a, n,  , s, h, h,  , s, t, a, k, e, o, u, t, s,  , v, c, r
-s01e04, Season1: 0.0-1381.3973125: b, e, n, e, s,  , b, l, u, r, t, s,  , f, a, r, s, i,  , g, e, r, a, l, d, o,  , h, e, z, b, o, l, l, a, h,  , h, m, m,  , h, o, r, n, e, c, k,  , h, u, h, u,  , h, y, p, o, g, l, y, c, e, m, i, c,  , k, r, a, m, e, r, i, c, a,  , m, a, g, n, e, t, i, c, a, l, l, y,  , r, o, l, o, d, e, x,  , s, c, r, e, e, n, e, r,  , s, o, n, i, c, s,  , t, r, a, p, e, z, o, i, d, s,  , w, e, ', r, e, w, e
-s01e01, Season1: 0.0-1386.2186875: b, a, g, g, i, e,  , c, o, s, t, a, n, z, a,  , d, e, c, a, f,  , h, a, n, d, e, r,  , h, m, m,  , h, o, n, k, s,  , m, o, t, i, v, a, t, e, s,  , o, v, e, r, d, i, e,  , o, v, e, r, d, r, y,  , o, v, e, r, w, e, t,  , p, e, r, k,  , s, o, f, t, e, n, e, r,  , s, s, h, h, h, o, o, o,  , t, u, m, b, l, e, w, e, e, d, s,  , w, a, s, t, e, b, a, s, k, e, t,  , w, h,  , w, h, h, h, h, h, h,  , z, i, p, l, o, c
+s01e04, speaker: 15.245-18.28: m, a, g, n, e, t, i, c, a, l, l, y
+s01e04, speaker: 127.425-130.625: h, u, h, u
+s01e04, speaker: 274.435-277.3: s, c, r, e, e, n, e, r
+s01e04, speaker: 292.485-294.125: h, o, r, n, e, c, k
+s01e04, speaker: 321.85-324.015: k, r, a, m, e, r, i, c, a
+s01e04, speaker: 438.435-440.63: g, e, r, a, l, d, o
+s01e04, speaker: 461.99-465.06: h, y, p, o, g, l, y, c, e, m, i, c
+s01e04, speaker: 465.36-469.1: h, e, z, b, o, l, l, a, h
+s01e04, speaker: 477.875-480.41: f, a, r, s, i
+s01e04, speaker: 699.46-702.065: h, m, m
+s01e04, speaker: 704.535-706.735: b, l, u, r, t, s
+s01e04, speaker: 716.645-718.75: h, m, m
+s01e04, speaker: 782.975-786.48: h, o, r, n, e, c, k
+s01e04, speaker: 794.955-797.09: h, o, r, n, e, c, k
+s01e04, speaker: 804.8-806.5: h, o, r, n, e, c, k
+s01e04, speaker: 1029.76-1031.76: t, r, a, p, e, z, o, i, d, s
+s01e04, speaker: 1034.625-1037.8: r, o, l, o, d, e, x
+s01e04, speaker: 1084.775-1086.18: h, o, r, n, e, c, k
+s01e04, speaker: 1178.14-1179.305: h, o, r, n, e, c, k
+s01e04, speaker: 1184.71-1187.18: h, o, r, n, e, c, k
+s01e04, speaker: 1226.89-1230.125: b, e, n, e, s,  , h, o, r, n, e, c, k
+s01e04, speaker: 1237.83-1239.565: h, m, m
+s01e04, speaker: 1256.985-1259.42: w, e, ', r, e, w, e
+s01e04, speaker: 1268.495-1270.23: s, o, n, i, c, s
+s01e02, speaker: 34.13-36.93: c, h, e, c, k, b, o, o, k
+s01e02, speaker: 36.93-38.8: c, h, e, c, k, b, o, o, k
+s01e02, speaker: 38.8-40.57: c, h, e, c, k, b, o, o, k
+s01e02, speaker: 102.265-104.53: m, e, i, n
+s01e02, speaker: 124.72-127.39: f, o, r, n, i, c, a, t, o, r
+s01e02, speaker: 289.685-291.15: b, r, i, c, k, e, r
+s01e02, speaker: 291.15-292.555: b, r, i, c, k, e, r
+s01e02, speaker: 362.655-365.26: s, a, g, m, a, n
+s01e02, speaker: 365.26-367.06: s, a, g, m, a, n
+s01e02, speaker: 367.06-369.73: s, a, g, m, a, n
+s01e02, speaker: 384.48-386.115: s, a, g, m, a, n
+s01e02, speaker: 386.115-389.015: s, a, g, m, a, n
+s01e02, speaker: 401.93-403.495: s, a, g, m, a, n
+s01e02, speaker: 403.495-404.665: o, p, p, e, n,  , s, a, g, m, a, n
+s01e02, speaker: 404.665-407.165: s, a, g, m, a, n
+s01e02, speaker: 506.635-509.17: r, i, c, o, n, i, c
+s01e02, speaker: 539.3-541.37: b, o, u, i, l, l, a, b, a, i, s, s, e
+s01e02, speaker: 642.17-644.64: l, o, n, i
+s01e02, speaker: 644.91-647.44: l, o, n, i
+s01e02, speaker: 647.44-649.645: l, o, n, i
+s01e02, speaker: 649.645-651.815: l, o, n, i
+s01e02, speaker: 697.945-699.925: m, o, r, t, y
+s01e02, speaker: 737.365-739.43: l, o, n, i
+s01e02, speaker: 740.1-742.405: l, o, n, i
+s01e02, speaker: 742.405-744.2: l, o, n, i
+s01e02, speaker: 800.03-802.4: h, a, r
+s01e02, speaker: 802.7-804.23: b, i, n, s, o, n
+s01e02, speaker: 804.23-805.9: h, a, r, b, i, n, s, o, n
+s01e02, speaker: 805.9-807.9: h, a, r, b, i, n, s, o, n
+s01e02, speaker: 819.65-821.78: v, e, l, a, y
+s01e02, speaker: 822.28-823.885: c, o, r, e, v, e, l, a, y
+s01e02, speaker: 858.385-860.455: c, o, r, e, v, e, l, a, y
+s01e02, speaker: 860.455-861.825: v, a, n, d, e, l, a, y
+s01e02, speaker: 861.825-863.29: c, o, r, e, v, e, l, a, y
+s01e02, speaker: 879.84-882.91: s, a, g, m, a, n
+s01e02, speaker: 889.185-891.055: v, a, n, d, e, l, a, y
+s01e02, speaker: 976.17-977.47: m, o, r, t, y
+s01e02, speaker: 1004.695-1009.0: v, a, n, d, e, l, a, y
+s01e02, speaker: 1071.83-1073.6: q, u, o, n, e
+s01e02, speaker: 1075.6-1077.405: q, u, o, n, e
+s01e02, speaker: 1085.28-1087.88: q, u, o, n, e
+s01e02, speaker: 1093.62-1095.855: q, u, o, n, e
+s01e02, speaker: 1105.535-1108.7: q, u, o, n, e
+s01e02, speaker: 1153.245-1155.62: b, e, n, n, e, s
+s01e02, speaker: 1193.655-1195.725: l, e, v, e, e, n
+s01e02, speaker: 1202.695-1205.13: m, e, l, l, e, n, c, a, m, p
+s01e02, speaker: 1250.31-1253.68: b, e, n, e, s
+s01e02, speaker: 1297.725-1299.495: s, t, a, k, e, o, u, t
+s01e03, speaker: 135.695-139.1: l, e, f, t, o, v, e, r, s
+s01e03, speaker: 149.045-151.48: b, e, n, e, s
+s01e03, speaker: 312.84-316.345: j, e, r
+s01e03, speaker: 319.745-321.98: v, c, r
+s01e03, speaker: 397.09-401.065: c, l, a, p, c, o
+s01e03, speaker: 433.225-436.095: v, c, r
+s01e03, speaker: 498.46-499.96: m, e, r, m, a, n
+s01e03, speaker: 530.695-533.595: m, a, n, h, u, n, t, s,  , s, t, a, k, e, o, u, t, s
+s01e03, speaker: 796.725-797.825: h, m, m
+s01e03, speaker: 900.025-901.795: s, h, h
+s01e03, speaker: 1134.93-1136.695: b, r, i, s, k, e, t
+s01e03, speaker: 1208.97-1210.505: h, o, u, s, e, w, a, r, m, i, n, g, s
+s01e03, speaker: 1262.225-1263.655: b, a, r, b, e, c, u, i, n, g
+s01e03, speaker: 1290.05-1292.25: m, a, s, s, e, u, s, e
+s01e01, speaker: 88.985-90.155: c, o, s, t, a, n, z, a
+s01e01, speaker: 90.155-91.52: d, e, c, a, f
+s01e01, speaker: 96.155-97.49: d, e, c, a, f
+s01e01, speaker: 98.56-99.66: d, e, c, a, f
+s01e01, speaker: 152.945-155.215: w, h
+s01e01, speaker: 227.955-229.59: h, m, m
+s01e01, speaker: 265.96-267.225: p, e, r, k
+s01e01, speaker: 289.415-292.185: s, o, f, t, e, n, e, r
+s01e01, speaker: 342.305-344.035: h, m, m
+s01e01, speaker: 363.89-365.46: o, v, e, r, d, r, y
+s01e01, speaker: 365.46-366.795: o, v, e, r, d, r, y
+s01e01, speaker: 367.965-370.195: o, v, e, r, w, e, t
+s01e01, speaker: 382.645-386.21: o, v, e, r, d, i, e,  , o, v, e, r, d, r, y
+s01e01, speaker: 649.775-651.345: h, m, m
+s01e01, speaker: 864.895-869.265: s, s, h, h, h, o, o, o,  , w, h, h, h, h, h, h
+s01e01, speaker: 936.995-938.535: w, a, s, t, e, b, a, s, k, e, t
+s01e01, speaker: 948.645-951.01: b, a, g, g, i, e,  , z, i, p, l, o, c
+s01e01, speaker: 952.545-955.25: t, u, m, b, l, e, w, e, e, d, s
+s01e01, speaker: 1020.445-1022.35: h, a, n, d, e, r
+s01e01, speaker: 1074.535-1078.975: m, o, t, i, v, a, t, e, s
+s01e01, speaker: 1294.955-1296.56: h, o, n, k, s
+s01e05, speaker: 19.98-21.285: a, p, p, e, t, i, z, e, r, s
+s01e05, speaker: 85.78-86.845: e, h, h
+s01e05, speaker: 183.175-186.71: f, a, u, c, e, t, s
+s01e05, speaker: 199.025-200.93: m, u, t, a, t, e, s
+s01e05, speaker: 204.065-205.835: t, e, r, r, o, r, i, z, e, d
+s01e05, speaker: 225.585-226.955: w, i, l, k, e, n, s, o, n
+s01e05, speaker: 240.165-242.535: w, i, l, k, e, n, s, o, n
+s01e05, speaker: 247.875-249.31: c, e, n, t, r, a, x
+s01e05, speaker: 251.215-253.38: t, e, l, e, v, i, s, i, n, g
+s01e05, speaker: 253.38-255.185: t, e, l, e, v, i, s, i, n, g
+s01e05, speaker: 267.265-269.365: w, i, l, k, e, n, s, o, n
+s01e05, speaker: 388.285-389.785: t, o, o, t, h, b, r, u, s, h, e, s
+s01e05, speaker: 447.475-448.675: c, e, n, t, r, a, x
+s01e05, speaker: 473.4-476.435: c, o, s, t, a, n, z, a
+s01e05, speaker: 493.25-495.125: w, i, l, k, e, n, s, o, n
+s01e05, speaker: 497.255-499.86: c, e, n, t, r, a, x
+s01e05, speaker: 516.175-517.745: k, s, h
+s01e05, speaker: 517.745-521.245: v, v, v, v, t
+s01e05, speaker: 572.635-576.27: w, i, l, k, e, n, s, o, n
+s01e05, speaker: 630.26-634.43: w, i, l, k, e, n, s, o, n
+s01e05, speaker: 636.06-640.32: c, e, n, t, r, a, x
+s01e05, speaker: 1051.075-1054.415: f, a, u, c, e, t, s
+s01e05, speaker: 1112.405-1114.905: f, l, u, c, t, u, a, t, e, s
+s01e05, speaker: 1114.905-1117.975: f, l, u, c, t, u, a, t, e, s
+s01e05, speaker: 1186.78-1189.615: w, i, l, k, e, n, s, o, n
+s01e05, speaker: 1189.615-1191.42: w, i, l, k, e, n, s, o, n
+s01e05, speaker: 1248.275-1250.11: p, s, s, t
+s01e05, speaker: 1255.22-1258.22: w, i, l, k, e, n, s, o, n
+s01e05, speaker: 1259.59-1262.125: t, r, a, m, c, o
+s01e05, speaker: 1274.165-1275.87: s, h, h

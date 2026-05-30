@@ -159,4 +159,5 @@ def process_srts(folder_path, test_mode=False):
         print(f"Done. ✓ {success} processed  ⊘ {skipped} skipped  ✗ {failed} failed.")
 
 
-process_srts(FOLDER_PATH, test_mode=TEST_MODE)
+if __name__ == "__main__":
+    process_srts(FOLDER_PATH, test_mode=TEST_MODE)
