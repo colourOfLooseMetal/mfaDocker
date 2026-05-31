@@ -1,7 +1,7 @@
 import ffmpeg
 import os
 
-FOLDER_PATH = r"./Seinfeld/Season 1"  # <-- change this
+FOLDER_PATH = r"./Seinfeld/Season9"  # <-- change this
 
 def extract_subtitles(folder_path):
     if not os.path.isdir(folder_path):
