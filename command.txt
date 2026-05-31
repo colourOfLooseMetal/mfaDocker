@@ -11,4 +11,4 @@ mfa align /data english_us_mfa english_mfa /data/output --output_format json
 mfa validate /data/Seinfeld/Season1 english_us_mfa english_mfa --output_directory /data/output --output_format json --g2p_model_path english_us_arpa --clean
 
 
-/data/Seinfeld/Season1 english_us_mfa english_mfa /data/output --output_format json --g2p_model_path english_us_arpa --clean
+mfa align /data/Seinfeld/Season1 english_us_mfa english_mfa /data/output --output_format json --g2p_model_path english_us_arpa --clean

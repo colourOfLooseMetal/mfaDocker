@@ -53,8 +53,11 @@ wordVideos/                        — gitignored output mp4s from
 - MFA expects `.wav` + `.TextGrid` pairs in the same folder. The docstring in
   `srtToTextGrid.py` warns: delete stale `.txt` transcripts before
   `mfa align`, or MFA prefers them over the TextGrid.
-- All step scripts have a top-of-file `FOLDER_PATH` constant (currently season-
-  scoped). Edit per run.
+- The per-folder step scripts loop all seasons via a top-of-file `SEASONS`
+  range (`range(1, 10)`; `renameFiles.py` uses `range(2, 10)` to skip the
+  already-renamed Season 1) and build `./Seinfeld/Season{n}` paths.
+  `renameFiles.py` derives `sNNeMM` names by parsing `SxxEyy` from each
+  source filename, so it is idempotent and safe to re-run.
 
 ## Maintaining this file
 

@@ -2,7 +2,7 @@ import pysrt
 import os
 import re
 
-FOLDER_PATH = r"./Seinfeld/Season1"  # <-- change this
+SEASONS = range(1, 10)  # Season1 .. Season9
 
 def num_there(s):
     return any(i.isdigit() for i in s)
@@ -50,4 +50,5 @@ def extract_text_from_srts(folder_path):
         f.write(full_text)
 
     print(f"[OK]      {filename} → {os.path.basename(output_path)}")
-extract_text_from_srts(FOLDER_PATH)
+for season in SEASONS:
+    extract_text_from_srts(f"./Seinfeld/Season{season}")

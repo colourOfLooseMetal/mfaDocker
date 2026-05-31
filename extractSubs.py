@@ -1,7 +1,7 @@
 import ffmpeg
 import os
 
-FOLDER_PATH = r"./Seinfeld/Season9"  # <-- change this
+SEASONS = range(1, 10)  # Season1 .. Season9
 
 def extract_subtitles(folder_path):
     if not os.path.isdir(folder_path):
@@ -49,4 +49,5 @@ def extract_subtitles(folder_path):
     print(f"\nDone. ✓ {success} extracted  ⊘ {skipped} skipped  ✗ {failed} failed.")
 
 
-extract_subtitles(FOLDER_PATH)
+for season in SEASONS:
+    extract_subtitles(f"./Seinfeld/Season{season}")

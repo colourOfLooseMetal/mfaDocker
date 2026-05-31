@@ -22,7 +22,7 @@ from praatio.utilities.constants import Interval
 
 from sanatizeSRTsaveToTxt import clean_text, convert_numbers
 
-FOLDER_PATH = r"./Seinfeld/Season1"  # <-- change this
+SEASONS = range(1, 10)  # Season1 .. Season9
 TIER_NAME = "speaker"
 PAD_SEC = 0.5      # padding each side of every SRT interval
 MIN_DUR = 0.10     # MFA silently skips intervals < 100 ms
@@ -148,4 +148,5 @@ def process_srts(folder_path, test_mode=False):
 
 
 if __name__ == "__main__":
-    process_srts(FOLDER_PATH, test_mode=TEST_MODE)
+    for season in SEASONS:
+        process_srts(f"./Seinfeld/Season{season}", test_mode=TEST_MODE)
