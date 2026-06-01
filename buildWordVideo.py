@@ -22,8 +22,8 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import ttk
 
-JSON_DIR = r"./wordTimings"
-MKV_DIR = r"./Seinfeld/Season1"
+JSON_DIR = r"./output_final"
+MKV_DIR = r"./Seinfeld/allEpisodes"
 OUTPUT_DIR = r"./wordVideos"
 
 PAD_SEC = 0.02

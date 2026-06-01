@@ -4,6 +4,8 @@ mfa model download acoustic english_mfa
 
 mfa model download dictionary english_us_mfa
 
+mfa model download g2p english_us_arpa
+
 mfa align /data english_us_mfa english_mfa /data/output --output_format json
 
 
@@ -12,3 +14,9 @@ mfa validate /data/Seinfeld/Season1 english_us_mfa english_mfa --output_director
 
 
 mfa align /data/Seinfeld/Season1 english_us_mfa english_mfa /data/output --output_format json --g2p_model_path english_us_arpa --clean
+
+
+
+mfa adapt /data/Seinfeld/allWavAndTG english_us_mfa english_mfa /data/models/seinfeld_adapted.zip --output_directory /data/output_adapted --output_format json --fine_tune --clean
+
+mfa align /data/Seinfeld/allWavAndTG english_us_mfa /data/models/seinfeld_adapted.zip /data/output_final --output_format json --g2p_model_path english_us_arpa --fine_tune --clean
