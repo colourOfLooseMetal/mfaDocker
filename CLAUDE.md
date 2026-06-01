@@ -31,18 +31,29 @@ srtToTextGrid.py                   — step 5: .srt + .wav → Praat .TextGrid
                                      from sanatizeSRTsaveToTxt.py)
 findNumbersInSubtitles.py          — ad-hoc: dump SRT lines containing digits
 buildWordVideo.py                  — tkinter UI: pick words → ffmpeg clip
-                                     mashup, reads wordTimings/ + Season1 .mkv
+                                     mashup, reads output_final/ +
+                                     Seinfeld/allEpisodes/ .mkv
+sampleAlignmentQuality.py          — classify lines in alignment_analysis.csv
+                                     by quality rules, render subtitled
+                                     single-word clips per bucket (reuses
+                                     extract_segment from buildWordVideo.py)
 
 Seinfeld/SeasonN/                  — gitignored media + per-episode
                                      .srt / .wav / .txt / .TextGrid
+Seinfeld/allEpisodes/sXXeYY.mkv    — gitignored flat copy of every episode
 output/sXXeYY.json                 — MFA alignment per episode
 output/alignment_analysis.csv      — cross-episode summary
 output/oov_counts_*.txt            — OOV word frequencies
 output/oovs_found_*.txt            — OOV word list
 output/utterance_oovs.txt          — OOVs grouped by utterance
+output_final/sXXeYY.json           — final MFA word/phone timings (all seasons)
+output_final/alignment_analysis.csv — per-line MFA quality metrics
+output_final/alignment_line_quality.csv — per-line metrics + quality category
 wordTimings/sXXeYY.json            — post-processed per-episode word timings
 wordVideos/                        — gitignored output mp4s from
                                      buildWordVideo.py
+wordVideos/quality_samples/        — per-category sample clips + manifest.csv
+                                     from sampleAlignmentQuality.py
 .idea/                             — JetBrains project config
 ```
 
