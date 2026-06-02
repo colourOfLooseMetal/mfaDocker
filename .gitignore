@@ -3,3 +3,5 @@
 *.wav
 Seinfeld/
 wordVideos/
+wordClips/
+web/ffmpeg/*.wasm

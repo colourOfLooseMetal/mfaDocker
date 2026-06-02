@@ -1,0 +1,106 @@
+/* Full 90s GeoCities kitsch theme. */
+body {
+  margin: 0;
+  font-family: "Comic Sans MS", "Times New Roman", cursive, serif;
+  color: #102040;
+  background-color: #008080;            /* classic teal */
+  background-image:
+    repeating-linear-gradient(45deg,
+      rgba(255,255,255,.06) 0 12px, rgba(0,0,0,.06) 12px 24px);
+}
+
+.page { max-width: 760px; margin: 0 auto; padding: 8px; }
+
+.theme-switch {
+  text-align: right; font-size: 12px; color: #ffff66; padding: 4px;
+}
+.theme-switch a { color: #ffff66; }
+
+.masthead {
+  text-align: center;
+  border: 4px ridge #c0c0c0;
+  background: #000080;
+  color: #fff;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.logo {
+  margin: 0;
+  font-family: "Brush Script MT", "Segoe Script", cursive;
+  font-size: 72px;
+  font-weight: bold;
+  color: #e60000;                       /* Seinfeld red */
+  text-shadow: 2px 2px 0 #800000, 4px 4px 0 rgba(0,0,0,.4);
+  letter-spacing: 1px;
+}
+.tagline {
+  margin: 0 0 8px;
+  font-size: 20px; color: #ffff66; font-weight: bold;
+  text-shadow: 1px 1px 0 #000;
+}
+marquee.kitsch-only {
+  color: #00ff00; background: #000; border: 2px inset #00ff00;
+  padding: 4px; font-size: 14px;
+}
+
+.panel {
+  border: 4px ridge #c0c0c0;
+  background: #d4d0c8;                   /* win9x grey */
+  padding: 14px;
+}
+
+.engine { margin: 0 0 12px; font-weight: bold; color: #000080; }
+
+.row { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
+label { font-weight: bold; }
+input[type="text"] {
+  flex: 1; padding: 4px; border: 2px inset #808080; font-family: inherit;
+  font-size: 16px;
+}
+
+button {
+  font-family: inherit; font-size: 15px; font-weight: bold;
+  padding: 4px 12px; cursor: pointer;
+  border: 3px outset #c0c0c0; background: #c0c0c0; color: #000;
+}
+button:active { border-style: inset; }
+button:disabled { color: #808080; cursor: default; }
+.build {
+  font-size: 18px; padding: 8px 20px;
+  background: #ffd700; border-color: #ffe680;
+}
+
+.suggestions, .selected { list-style: none; margin: 4px 0; padding: 0; }
+.suggestions li {
+  padding: 3px 8px; cursor: pointer; background: #fff;
+  border: 1px solid #808080; margin-bottom: -1px;
+}
+.suggestions li:hover { background: #000080; color: #fff; }
+.suggestions li.low, .selected li.low { color: #b00; font-style: italic; }
+
+.sentence { border: 2px groove #fff; margin: 12px 0; padding: 8px; }
+.sentence legend { font-weight: bold; color: #000080; }
+.selected li {
+  display: inline-block; background: #ffffcc; border: 2px outset #e0e0a0;
+  padding: 2px 6px; margin: 3px; font-size: 16px;
+}
+.selected .rm {
+  border: none; background: transparent; color: #b00; font-weight: bold;
+  padding: 0 0 0 6px; font-size: 14px;
+}
+
+.gap-label { font-weight: bold; min-width: 60px; }
+.status { font-weight: bold; color: #000080; }
+
+.result { margin-top: 14px; text-align: center; border-top: 2px groove #fff; padding-top: 12px; }
+.preview { width: 480px; max-width: 100%; border: 3px ridge #c0c0c0; background: #000; }
+.download {
+  display: inline-block; margin-top: 8px; font-size: 18px; font-weight: bold;
+  color: #0000ee;
+}
+
+.footer { text-align: center; margin: 14px 0; color: #fff; font-size: 13px; }
+.counter {
+  font-family: "Courier New", monospace; background: #000; color: #0f0;
+  padding: 1px 6px; border: 1px solid #0f0;
+}

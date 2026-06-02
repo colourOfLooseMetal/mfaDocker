@@ -21,6 +21,7 @@ word timings.
 CLAUDE.md                          — this file
 command.txt                        — docker run + mfa align invocations
 .gitignore                         — ignores *.mp4 *.mkv *.wav Seinfeld/
+                                     wordVideos/ wordClips/ web/ffmpeg/*.wasm
 
 renameFiles.py                     — step 1: rename .mkv to sXXeYY
 extractSubs.py                     — step 2: .mkv → .srt (ffmpeg, stream 0:s:0)
@@ -31,16 +32,37 @@ srtToTextGrid.py                   — step 5: .srt + .wav → Praat .TextGrid
                                      from sanatizeSRTsaveToTxt.py)
 findNumbersInSubtitles.py          — ad-hoc: dump SRT lines containing digits
 buildWordVideo.py                  — tkinter UI: pick words → ffmpeg clip
-                                     mashup, reads output_final/ +
-                                     Seinfeld/allEpisodes/ .mkv
+                                     mashup. Prefers pre-cut wordClips/; falls
+                                     back to live extraction from allEpisodes/
 sampleAlignmentQuality.py          — classify lines in alignment_analysis.csv
                                      by quality rules, render subtitled
                                      single-word clips per bucket (reuses
                                      extract_segment from buildWordVideo.py)
+scoreWordsW2V.py                    — wav2vec2 CTC per-word acoustic confidence
+                                     (slices allWavs/ at MFA bounds, GPU-batched)
+                                     → wordScores/sXXeYY.json
+sampleConfidenceBands.py           — render subtitled word clips grouped by
+                                     confidence (relative deciles / absolute
+                                     bands) for manual QA; reuses
+                                     extract_segment from buildWordVideo.py
+confHistogram.py                   — conf distribution chart + CSV (matplotlib)
+wordCandidates.py                  — confidence cutoff (quality-first per-word
+                                     pool, low-quality resurrection) +
+                                     weighted_pick; feeds buildWordVideo.py
+cutWordClips.py                    — pre-cut accepted clips (subtitle burned,
+                                     720x540 normalized) → wordClips/<word>/ +
+                                     index.json; builder needs no source .mkv
+web/                               — browser frontend: retro Seinfeld page +
+                                     client-side ffmpeg.wasm clip joining
+                                     (index.html, themes/, js/, ffmpeg/,
+                                     serve.py)
+web/README.md                      — setup, ffmpeg vendor re-fetch commands,
+                                     known TODOs (clip index not finalized)
 
-Seinfeld/SeasonN/                  — gitignored media + per-episode
-                                     .srt / .wav / .txt / .TextGrid
-Seinfeld/allEpisodes/sXXeYY.mkv    — gitignored flat copy of every episode
+Seinfeld/allEpisodes/sXXeYY.mkv    — gitignored flat: every episode .mkv
+Seinfeld/allWavs/sXXeYY.wav        — gitignored flat: 16 kHz mono .wav
+Seinfeld/srts/sXXeYY.srt           — gitignored flat: extracted subtitles
+Seinfeld/textgrids/sXXeYY.TextGrid — gitignored flat: MFA input TextGrids
 output/sXXeYY.json                 — MFA alignment per episode
 output/alignment_analysis.csv      — cross-episode summary
 output/oov_counts_*.txt            — OOV word frequencies
@@ -54,6 +76,12 @@ wordVideos/                        — gitignored output mp4s from
                                      buildWordVideo.py
 wordVideos/quality_samples/        — per-category sample clips + manifest.csv
                                      from sampleAlignmentQuality.py
+wordScores/sXXeYY.json             — per-word wav2vec2 confidence + greedy
+                                     decode + prev/next, from scoreWordsW2V.py
+wordClips/<word>/*.mp4             — gitignored pre-cut subtitled word clips +
+                                     index.json manifest, from cutWordClips.py
+wordVideos/confSamples/            — conf-banded QA clips + manifest.csv +
+                                     conf_distribution.png/.csv
 .idea/                             — JetBrains project config
 ```
 
@@ -69,6 +97,11 @@ wordVideos/quality_samples/        — per-category sample clips + manifest.csv
   already-renamed Season 1) and build `./Seinfeld/Season{n}` paths.
   `renameFiles.py` derives `sNNeMM` names by parsing `SxxEyy` from each
   source filename, so it is idempotent and safe to re-run.
+- Episodes mix 4:3 and 16:9 source resolutions, so `extract_segment` takes
+  `scale_to=(CLIP_W, CLIP_H)` (720x540) to normalize every clip — required for
+  `-c copy` concat (desktop and web). `cutWordClips.py` and the mkv-fallback
+  path pass it; the caption sidecar is written to a temp file so apostrophe
+  words ("don't", "it's") don't break drawtext's textfile path.
 
 ## Maintaining this file
 
