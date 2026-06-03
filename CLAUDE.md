@@ -34,10 +34,6 @@ findNumbersInSubtitles.py          — ad-hoc: dump SRT lines containing digits
 buildWordVideo.py                  — tkinter UI: pick words → ffmpeg clip
                                      mashup. Prefers pre-cut wordClips/; falls
                                      back to live extraction from allEpisodes/
-sampleAlignmentQuality.py          — classify lines in alignment_analysis.csv
-                                     by quality rules, render subtitled
-                                     single-word clips per bucket (reuses
-                                     extract_segment from buildWordVideo.py)
 scoreWordsW2V.py                    — wav2vec2 CTC per-word acoustic confidence
                                      (slices allWavs/ at MFA bounds, GPU-batched)
                                      → wordScores/sXXeYY.json
@@ -45,6 +41,7 @@ sampleConfidenceBands.py           — render subtitled word clips grouped by
                                      confidence (relative deciles / absolute
                                      bands) for manual QA; reuses
                                      extract_segment from buildWordVideo.py
+              
 confHistogram.py                   — conf distribution chart + CSV (matplotlib)
 wordCandidates.py                  — confidence cutoff (quality-first per-word
                                      pool, low-quality resurrection) +
@@ -54,8 +51,7 @@ cutWordClips.py                    — pre-cut accepted clips (subtitle burned,
                                      index.json; builder needs no source .mkv
 ngramCounts.py                     — count word n-grams (2–6) across all
                                      successfully aligned SRT lines (from
-                                     TextGrids + alignment_line_quality.csv)
-                                     → ngrams.json (count > 3 only)
+                                     TextGrids)
 web/                               — browser frontend: retro Seinfeld page +
                                      client-side ffmpeg.wasm clip joining
                                      (index.html, themes/, js/, ffmpeg/,
@@ -67,14 +63,8 @@ Seinfeld/allEpisodes/sXXeYY.mkv    — gitignored flat: every episode .mkv
 Seinfeld/allWavs/sXXeYY.wav        — gitignored flat: 16 kHz mono .wav
 Seinfeld/srts/sXXeYY.srt           — gitignored flat: extracted subtitles
 Seinfeld/textgrids/sXXeYY.TextGrid — gitignored flat: MFA input TextGrids
-output/sXXeYY.json                 — MFA alignment per episode
-output/alignment_analysis.csv      — cross-episode summary
-output/oov_counts_*.txt            — OOV word frequencies
-output/oovs_found_*.txt            — OOV word list
-output/utterance_oovs.txt          — OOVs grouped by utterance
 output_final/sXXeYY.json           — final MFA word/phone timings (all seasons)
-output_final/alignment_analysis.csv — per-line MFA quality metrics
-output_final/alignment_line_quality.csv — per-line metrics + quality category
+
 wordTimings/sXXeYY.json            — post-processed per-episode word timings
 wordVideos/                        — gitignored output mp4s from
                                      buildWordVideo.py
@@ -86,9 +76,6 @@ wordClips/<word>/*.mp4             — gitignored pre-cut subtitled word clips +
                                      index.json manifest, from cutWordClips.py
 wordVideos/confSamples/            — conf-banded QA clips + manifest.csv +
                                      conf_distribution.png/.csv
-ngrams.json                        — n-gram counts (2–6 word phrases, count > 3)
-                                     from ngramCounts.py; gitignored-sized but
-                                     not gitignored (28k phrases)
 .idea/                             — JetBrains project config
 ```
 
