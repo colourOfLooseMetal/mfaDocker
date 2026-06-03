@@ -75,11 +75,17 @@ buildDialogueIndex.py              — step 7: join output_final/ word timings +
                                      grouped into subtitle lines, by midpoint) +
                                      dialogue.sample.json
 web/                               — browser frontend: retro Seinfeld page +
-                                     client-side ffmpeg.wasm clip joining
-                                     (index.html, themes/, js/, ffmpeg/,
-                                     serve.py)
+                                     client-side ffmpeg.wasm n-gram mashup.
+                                     Loads lineClips/index.json; trims each
+                                     picked n-gram out of its sfvL_*.mp4 line
+                                     clip (joinSegments in js/ffmpeg.js).
+                                     CLIPS_BASE in js/clipIndex.js defaults to
+                                     /lineClips/ for dev; swap for DO Spaces CDN
+                                     (colm-extra-storage.nyc3.cdn.digitaloceanspaces.com/sfLines/)
+                                     in production. (index.html, themes/, js/,
+                                     ffmpeg/, serve.py)
 web/README.md                      — setup, ffmpeg vendor re-fetch commands,
-                                     known TODOs (clip index not finalized)
+                                     CLIPS_BASE / CDN swap instructions
 
 Seinfeld/allEpisodes/sXXeYY.mkv    — gitignored flat: every episode .mkv
 Seinfeld/allWavs/sXXeYY.wav        — gitignored flat: 16 kHz mono .wav

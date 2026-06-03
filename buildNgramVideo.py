@@ -32,7 +32,7 @@ OUTPUT_DIR = r"./wordVideos"
 PAD_SEC = 0.02
 TARGET_FPS = 30
 TARGET_AR = 48000
-TARGET_CRF = 21
+TARGET_CRF = 22
 MAX_HITS = 8
 
 # Normalized clip canvas (4:3). Mixed-resolution source episodes are scaled to
