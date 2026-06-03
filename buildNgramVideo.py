@@ -42,9 +42,9 @@ CLIP_W, CLIP_H = 640, 360
 # Burned-in captions
 BURN_SUBS_DEFAULT = True
 CAPTION_FONT = r"C:/Windows/Fonts/arial.ttf"
-CAPTION_FONTSIZE = 96
+CAPTION_FONTSIZE = 38
 CAPTION_BORDER = 4
-CAPTION_BOTTOM_PAD = 60  # pixels from bottom edge
+CAPTION_BOTTOM_PAD = 16  # pixels from bottom edge
 
 # Held-frame + silent-audio gap inserted after every non-last word.
 # Controlled live from the UI; these are the slider's default and upper bound.
@@ -196,9 +196,9 @@ def extract_segment(mkv_path, start, end, out_path, caption=None, pad_after=0.0,
     if pad <= 0:
         # No pad: original known-good single-input path with output-side -t.
         vf_parts = [f"fps={TARGET_FPS}", "setsar=1", "format=yuv420p"]
+        vf_parts += scale_filters
         if drawtext_filter:
             vf_parts.append(drawtext_filter)
-        vf_parts += scale_filters
         cmd = [
             "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
             "-ss", f"{start:.3f}",
@@ -220,9 +220,9 @@ def extract_segment(mkv_path, start, end, out_path, caption=None, pad_after=0.0,
             f"trim=0:{duration:.3f}", "setpts=PTS-STARTPTS",
             f"fps={TARGET_FPS}", "setsar=1", "format=yuv420p",
         ]
+        v_chain += scale_filters
         if drawtext_filter:
             v_chain.append(drawtext_filter)
-        v_chain += scale_filters
         v_chain.append(f"tpad=stop_mode=clone:stop_duration={pad:.3f}")
         v_part = "[0:v]" + ",".join(v_chain) + "[vout]"
         a_part = (

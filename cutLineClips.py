@@ -38,7 +38,7 @@ from ngramCandidates import NGRAMSCORES_DIR, build_ngram_candidate_index
 
 CLIPS_DIR = r"./lineClips"
 WORKERS = 4              # parallel ffmpeg processes
-MAX_LINES = None         # cap lines for a test run (None = all)
+MAX_LINES = None        # cap lines for a test run (None = all)
 VERBOSE_INDEX = False    # True: include stem/line_idx/n/i/conf/quality in index
                          # False: slim format {file, start_in_clip, end_in_clip}
 
@@ -109,13 +109,13 @@ def extract_line_with_word_captions(mkv_path, clip_start, clip_end, out_path,
             )
 
         vf_parts = [f"fps={TARGET_FPS}", "setsar=1", "format=yuv420p"]
-        vf_parts += drawtext_filters
         if scale_to:
             sw, sh = scale_to
             vf_parts += [
                 f"scale={sw}:{sh}:force_original_aspect_ratio=increase",
                 f"crop={sw}:{sh}", "setsar=1",
             ]
+        vf_parts += drawtext_filters
         cmd = [
             "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
             "-ss", f"{clip_start:.3f}",
