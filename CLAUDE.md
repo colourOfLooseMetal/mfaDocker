@@ -11,7 +11,7 @@ word timings.
 3. `extractWavAudio.py`       — `.mkv` → 16 kHz mono `.wav` (ffmpeg)
 4. `sanatizeSRTsaveToTxt.py`  — clean SRT, expand numerals to words → `.txt`
 5. `srtToTextGrid.py`         — `.srt` + `.wav` → padded `.TextGrid` for MFA
-6. `command.txt`              — Docker + `mfa align` invocations
+6. `command.txt`              — Docker + `mfa align` invocations. ran by user not claude agent
 
 `findNumbersInSubtitles.py` is a one-off helper to audit numeric lines.
 
@@ -19,7 +19,7 @@ word timings.
 
 ```
 CLAUDE.md                          — this file
-command.txt                        — docker run + mfa align invocations
+command.txt                        — docker run + mfa align invocations ran only by user not claude
 .gitignore                         — ignores *.mp4 *.mkv *.wav Seinfeld/
                                      wordVideos/ wordClips/ web/ffmpeg/*.wasm
 
@@ -52,6 +52,10 @@ wordCandidates.py                  — confidence cutoff (quality-first per-word
 cutWordClips.py                    — pre-cut accepted clips (subtitle burned,
                                      720x540 normalized) → wordClips/<word>/ +
                                      index.json; builder needs no source .mkv
+ngramCounts.py                     — count word n-grams (2–6) across all
+                                     successfully aligned SRT lines (from
+                                     TextGrids + alignment_line_quality.csv)
+                                     → ngrams.json (count > 3 only)
 web/                               — browser frontend: retro Seinfeld page +
                                      client-side ffmpeg.wasm clip joining
                                      (index.html, themes/, js/, ffmpeg/,
@@ -82,6 +86,9 @@ wordClips/<word>/*.mp4             — gitignored pre-cut subtitled word clips +
                                      index.json manifest, from cutWordClips.py
 wordVideos/confSamples/            — conf-banded QA clips + manifest.csv +
                                      conf_distribution.png/.csv
+ngrams.json                        — n-gram counts (2–6 word phrases, count > 3)
+                                     from ngramCounts.py; gitignored-sized but
+                                     not gitignored (28k phrases)
 .idea/                             — JetBrains project config
 ```
 
