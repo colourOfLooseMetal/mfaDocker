@@ -12,6 +12,8 @@ const BASE = new URL("ffmpeg/", document.baseURI).href;  // .../web/ffmpeg/
 
 const AR = 48000;
 const FPS = 30;
+const CRF = 21;       // matches buildNgramVideo.TARGET_CRF
+const PAD_SEC = 0.02; // matches buildNgramVideo.PAD_SEC (each side of the n-gram)
 
 let instance = null;
 let loading = null;
@@ -64,51 +66,73 @@ function gapExtendArgs(inName, outName, pad) {
   ];
 }
 
-// Join an ordered list of clip URLs into one mp4 Blob.
-//   mode:  "copy" (uniform clips, fast) | "encode" (fallback, slow)
-//   gap:   seconds of held-frame + silence after every clip except the last
-export async function joinClips(urls, { mode = "copy", gap = 0,
-                                        onLog, onProgress } = {}) {
+// Trim+re-encode one n-gram sub-segment [start-PAD, end+PAD] out of a line
+// clip already loaded in the FS as `inName`. Mirrors extract_segment's no-pad
+// branch in buildNgramVideo.py: fast -ss seek, locked encode params (so the
+// segments concat-copy), no scale (line clips are already 640x360). Output PTS
+// start at 0 via -avoid_negative_ts make_zero.
+function trimArgs(inName, outName, start, end) {
+  const ss = Math.max(0, start - PAD_SEC);
+  const dur = Math.max(end + PAD_SEC - ss, 0.01);
+  return [
+    "-ss", ss.toFixed(3),
+    "-i", inName,
+    "-t", dur.toFixed(3),
+    "-map", "0:v:0", "-map", "0:a:0",
+    "-vf", `fps=${FPS},setsar=1,format=yuv420p`,
+    "-c:v", "libx264", "-preset", "veryfast", "-crf", String(CRF),
+    "-c:a", "aac", "-b:a", "192k", "-ar", String(AR), "-ac", "2",
+    "-avoid_negative_ts", "make_zero",
+    outName,
+  ];
+}
+
+// Build one mp4 Blob from an ordered list of n-gram sub-segments. Each segment
+// is { url, start, end }: the line-clip URL and the n-gram's in-clip bounds.
+// We fetch each distinct line clip once, trim every segment out of it, then
+// concat-copy. `gap` adds held-frame + silence after each segment but the last.
+export async function joinSegments(segments, { gap = 0, onLog, onProgress } = {}) {
   const ff = await getFFmpeg();
   if (onLog) ff.on("log", ({ message }) => onLog(message));
   if (onProgress) ff.on("progress", ({ progress }) => onProgress(progress));
 
   const { fetchFile } = window.FFmpegUtil;
 
-  for (let i = 0; i < urls.length; i++) {
-    await ff.writeFile(`c${i}.mp4`, await fetchFile(urls[i]));
+  // Fetch each distinct line clip into the FS once (a clip can back several
+  // n-grams). Map url -> FS filename.
+  const srcFor = new Map();
+  let n = 0;
+  for (const seg of segments) {
+    if (!srcFor.has(seg.url)) {
+      const name = `src${n++}.mp4`;
+      await ff.writeFile(name, await fetchFile(seg.url));
+      srcFor.set(seg.url, name);
+    }
   }
+
   try { await ff.deleteFile("out.mp4"); } catch {}
 
-  if (mode === "encode") {
-    // Re-encode concat: tolerates any mismatch (no gap support here).
-    const args = [];
-    urls.forEach((_, i) => args.push("-i", `c${i}.mp4`));
-    const streams = urls.map((_, i) => `[${i}:v][${i}:a]`).join("");
-    args.push(
-      "-filter_complex", `${streams}concat=n=${urls.length}:v=1:a=1[v][a]`,
-      "-map", "[v]", "-map", "[a]",
-      "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p",
-      "-c:a", "aac", "-movflags", "+faststart", "out.mp4");
-    await ff.exec(args);
-  } else {
-    // Copy concat. Add per-clip held-frame gaps first if requested.
-    const segs = [];
-    for (let i = 0; i < urls.length; i++) {
-      if (gap > 0 && i < urls.length - 1) {
-        await ff.exec(gapExtendArgs(`c${i}.mp4`, `g${i}.mp4`, gap));
-        segs.push(`g${i}.mp4`);
-      } else {
-        segs.push(`c${i}.mp4`);
-      }
+  // Trim each segment, then optionally gap-extend all but the last.
+  const segNames = [];
+  for (let i = 0; i < segments.length; i++) {
+    const seg = segments[i];
+    const segName = `seg${i}.mp4`;
+    await ff.exec(trimArgs(srcFor.get(seg.url), segName, seg.start, seg.end));
+    if (gap > 0 && i < segments.length - 1) {
+      const gName = `g${i}.mp4`;
+      await ff.exec(gapExtendArgs(segName, gName, gap));
+      segNames.push(gName);
+    } else {
+      segNames.push(segName);
     }
-    const list = segs.map((s) => `file '${s}'`).join("\n");
-    await ff.writeFile("list.txt", new TextEncoder().encode(list));
-    await ff.exec([
-      "-f", "concat", "-safe", "0", "-i", "list.txt",
-      "-c", "copy", "-movflags", "+faststart", "out.mp4",
-    ]);
   }
+
+  const list = segNames.map((s) => `file '${s}'`).join("\n");
+  await ff.writeFile("list.txt", new TextEncoder().encode(list));
+  await ff.exec([
+    "-f", "concat", "-safe", "0", "-i", "list.txt",
+    "-c", "copy", "-movflags", "+faststart", "out.mp4",
+  ]);
 
   const data = await ff.readFile("out.mp4");
   if (!data?.length) throw new Error("ffmpeg produced empty output");

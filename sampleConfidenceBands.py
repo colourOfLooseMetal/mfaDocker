@@ -23,7 +23,7 @@ import random
 from collections import defaultdict
 from pathlib import Path
 
-from buildWordVideo import extract_segment, sanitize_filename, unique_output_path
+from buildNgramVideo import extract_segment, sanitize_filename, unique_output_path
 
 WORDSCORES_DIR = r"./wordScores"
 MKV_DIR = r"./Seinfeld/allEpisodes"

@@ -1,6 +1,6 @@
-// UI: autocomplete word picker -> client-side ffmpeg.wasm mashup.
-import { getFFmpeg, joinClips } from "./ffmpeg.js";
-import { loadClipIndex, wordQuality, weightedPick } from "./clipIndex.js";
+// UI: autocomplete n-gram picker -> client-side ffmpeg.wasm mashup.
+import { getFFmpeg, joinSegments } from "./ffmpeg.js";
+import { loadClipIndex, positionWeightedPick } from "./clipIndex.js";
 
 const MAX_HITS = 8;
 
@@ -22,8 +22,8 @@ const els = {
 };
 
 let INDEX = {};
-let WORDS = [];
-const selected = []; // array of chosen words (in order)
+let NGRAMS = [];
+const selected = []; // array of chosen n-grams (in order)
 
 // ---- engine preload (cache the 31MB before first build) ----
 async function preloadEngine() {
@@ -39,10 +39,10 @@ async function preloadEngine() {
 // ---- clip index ----
 async function loadIndex() {
   try {
-    const { index, words } = await loadClipIndex();
+    const { index, ngrams } = await loadClipIndex();
     INDEX = index;
-    WORDS = words;
-    els.status.textContent = `${words.length} words available`;
+    NGRAMS = ngrams;
+    els.status.textContent = `${ngrams.length} words/phrases available`;
     refreshSuggestions("");
   } catch (e) {
     els.status.textContent = e.message;
@@ -53,30 +53,26 @@ async function loadIndex() {
 function refreshSuggestions(prefix) {
   prefix = prefix.toLowerCase().trim();
   const hits = (prefix
-    ? WORDS.filter((w) => w.startsWith(prefix))
-    : WORDS).slice(0, MAX_HITS);
+    ? NGRAMS.filter((ng) => ng.startsWith(prefix))
+    : NGRAMS).slice(0, MAX_HITS);
   els.suggestions.innerHTML = "";
-  for (const w of hits) {
+  for (const ng of hits) {
     const li = document.createElement("li");
-    li.textContent = w;
-    if (wordQuality(INDEX[w]) === "low") {
-      li.classList.add("low");
-      li.textContent += "  (low quality)";
-    }
-    li.addEventListener("click", () => addWord(w));
+    li.textContent = ng;
+    li.addEventListener("click", () => addNgram(ng));
     els.suggestions.appendChild(li);
   }
 }
 
 // ---- selected list ----
-function addWord(word) {
-  word = word.toLowerCase().trim();
-  if (!word) return;
-  if (!INDEX[word]) {
-    els.status.textContent = `unknown word: ${word}`;
+function addNgram(ngram) {
+  ngram = ngram.toLowerCase().trim();
+  if (!ngram) return;
+  if (!INDEX[ngram]) {
+    els.status.textContent = `unknown word/phrase: ${ngram}`;
     return;
   }
-  selected.push(word);
+  selected.push(ngram);
   renderSelected();
   els.input.value = "";
   refreshSuggestions("");
@@ -85,11 +81,9 @@ function addWord(word) {
 
 function renderSelected() {
   els.selected.innerHTML = "";
-  selected.forEach((w, i) => {
+  selected.forEach((ng, i) => {
     const li = document.createElement("li");
-    const low = wordQuality(INDEX[w]) === "low";
-    li.textContent = low ? `${w}  [low quality]` : w;
-    if (low) li.classList.add("low");
+    li.textContent = ng;
     const x = document.createElement("button");
     x.textContent = "×";
     x.className = "rm";
@@ -104,13 +98,13 @@ function renderSelected() {
 // ---- build ----
 async function build() {
   if (!selected.length) return;
-  const words = [...selected];
+  const ngrams = [...selected];
   const gap = parseFloat(els.gap.value);
   setBusy(true);
   els.status.textContent = "building…";
   try {
-    const urls = words.map((w) => weightedPick(INDEX[w]).url);
-    const blob = await joinClips(urls, {
+    const segments = ngrams.map((ng) => positionWeightedPick(INDEX[ng]));
+    const blob = await joinSegments(segments, {
       gap,
       onProgress: (p) => {
         if (p > 0 && p <= 1) els.status.textContent = `building… ${Math.round(p * 100)}%`;
@@ -119,7 +113,7 @@ async function build() {
     const url = URL.createObjectURL(blob);
     els.preview.src = url;
     els.download.href = url;
-    els.download.download = filenameFor(words);
+    els.download.download = filenameFor(ngrams);
     els.result.hidden = false;
     els.status.textContent = `done — ${(blob.size / 1e6).toFixed(2)}MB`;
   } catch (e) {
@@ -129,8 +123,8 @@ async function build() {
   }
 }
 
-function filenameFor(words) {
-  const base = words.join("_").toLowerCase().replace(/[^a-z0-9_]/g, "");
+function filenameFor(ngrams) {
+  const base = ngrams.join("_").toLowerCase().replace(/[^a-z0-9_]/g, "");
   return `${base.slice(0, 100) || "mashup"}.mp4`;
 }
 
@@ -143,10 +137,10 @@ function setBusy(b) {
 // ---- wire up ----
 function init() {
   els.input.addEventListener("keyup", (e) => {
-    if (e.key === "Enter") { addWord(els.input.value); return; }
+    if (e.key === "Enter") { addNgram(els.input.value); return; }
     refreshSuggestions(els.input.value);
   });
-  els.add.addEventListener("click", () => addWord(els.input.value));
+  els.add.addEventListener("click", () => addNgram(els.input.value));
   els.clear.addEventListener("click", () => {
     selected.length = 0;
     renderSelected();

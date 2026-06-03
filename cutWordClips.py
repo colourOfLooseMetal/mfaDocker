@@ -20,7 +20,7 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-from buildWordVideo import CLIP_H, CLIP_W, MKV_DIR, PAD_SEC, extract_segment
+from buildNgramVideo import CLIP_H, CLIP_W, MKV_DIR, PAD_SEC, extract_segment
 from wordCandidates import build_candidate_index
 
 CLIPS_DIR = r"./wordClips"
