@@ -37,7 +37,7 @@ from buildNgramVideo import (
 from ngramCandidates import NGRAMSCORES_DIR, build_ngram_candidate_index
 
 CLIPS_DIR = r"./lineClips"
-WORKERS = 4              # parallel ffmpeg processes
+WORKERS = 2              # parallel ffmpeg processes
 MAX_LINES = None        # cap lines for a test run (None = all)
 VERBOSE_INDEX = False    # True: include stem/line_idx/n/i/conf/quality in index
                          # False: slim format {file, start_in_clip, end_in_clip}
