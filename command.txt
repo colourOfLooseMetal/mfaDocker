@@ -6,6 +6,8 @@ mfa model download dictionary english_us_mfa
 
 mfa model download g2p english_us_arpa
 
+
+#original command attempt
 mfa align /data english_us_mfa english_mfa /data/output --output_format json
 
 
