@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spaces CORS diagnostic</title>
+  <style>
+    body { font: 14px/1.5 system-ui, sans-serif; margin: 2rem; max-width: 880px; }
+    h1 { font-size: 1.25rem; }
+    code { background: #f0f0f0; padding: 1px 4px; border-radius: 3px; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; vertical-align: top; }
+    th { background: #f7f7f7; }
+    .ok { color: #0a7d28; font-weight: 600; }
+    .fail { color: #c0271a; font-weight: 600; }
+    .muted { color: #777; }
+    #origin { font-weight: 600; }
+    pre { background: #1e1e1e; color: #ddd; padding: 1rem; border-radius: 6px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h1>DigitalOcean Spaces CORS diagnostic</h1>
+  <p>
+    This page lives at origin <code id="origin">…</code>.<br>
+    That exact string is what the browser sends in the <code>Origin</code> request
+    header — your Spaces CORS <em>AllowedOrigin</em> must match it
+    <strong>literally</strong> (no trailing slash, no <code>/*</code>).
+  </p>
+
+  <p>
+    <button id="run">Re-run tests</button>
+    <span class="muted">Open DevTools → Console for full logs.</span>
+  </p>
+
+  <table id="results">
+    <thead>
+      <tr><th>Test</th><th>Endpoint</th><th>Result</th><th>Detail</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2 style="font-size:1rem">Console transcript</h2>
+  <pre id="log"></pre>
+
+  <script>
+    // ---- config: the clip the app would fetch ----
+    const PATH = "sfLines/sfvL_67912.mp4";
+    const CDN    = "https://colm-extra-storage.nyc3.cdn.digitaloceanspaces.com/";
+    const ORIGIN = "https://colm-extra-storage.nyc3.digitaloceanspaces.com/"; // non-CDN
+
+    const tbody = document.querySelector("#results tbody");
+    const logEl = document.getElementById("log");
+    document.getElementById("origin").textContent = location.origin;
+
+    function log(...a) {
+      console.log(...a);
+      logEl.textContent += a.map(x =>
+        typeof x === "string" ? x : JSON.stringify(x)).join(" ") + "\n";
+    }
+    function row(test, endpoint, ok, detail) {
+      const tr = document.createElement("tr");
+      tr.innerHTML =
+        `<td>${test}</td><td><code>${endpoint}</code></td>` +
+        `<td class="${ok ? "ok" : "fail"}">${ok ? "PASS" : "FAIL"}</td>` +
+        `<td>${detail}</td>`;
+      tbody.appendChild(tr);
+    }
+
+    // The exact operation the real app does in ffmpeg.js -> fetchFile():
+    // a cross-origin GET whose body we then read as bytes. If CORS is missing,
+    // the browser rejects with "TypeError: Failed to fetch" before we ever see
+    // a status. If CORS is present, .arrayBuffer() yields the real bytes.
+    async function corsReadTest(label, base) {
+      const url = base + PATH;
+      log(`\n[${label}] cors GET ${url}`);
+      try {
+        const res = await fetch(url, { mode: "cors", cache: "no-store" });
+        log(`  status: ${res.status} ${res.statusText}, type: ${res.type}`);
+        const buf = await res.arrayBuffer();
+        log(`  read ${buf.byteLength} bytes OK`);
+        row("cors fetch + read bytes", label, true,
+            `status ${res.status}, ${buf.byteLength.toLocaleString()} bytes read`);
+      } catch (e) {
+        log(`  ERROR: ${e.name}: ${e.message}`);
+        row("cors fetch + read bytes", label, false,
+            `${e.name}: ${e.message} — almost always a missing ` +
+            `Access-Control-Allow-Origin for <code>${location.origin}</code>`);
+      }
+    }
+
+    // Contrast probe: a no-cors fetch returns an *opaque* response. It does NOT
+    // throw even when CORS is absent, proving the object is reachable on the
+    // network and the problem is specifically the CORS policy, not a 404/DNS.
+    async function reachabilityTest(label, base) {
+      const url = base + PATH;
+      log(`\n[${label}] no-cors probe ${url}`);
+      try {
+        const res = await fetch(url, { mode: "no-cors", cache: "no-store" });
+        log(`  opaque response received (type: ${res.type}) — object is reachable`);
+        row("reachable (no-cors probe)", label, true,
+            `opaque response — file exists & is served`);
+      } catch (e) {
+        log(`  ERROR: ${e.name}: ${e.message}`);
+        row("reachable (no-cors probe)", label, false,
+            `${e.name}: ${e.message} — bad URL / DNS / offline (not a CORS issue)`);
+      }
+    }
+
+    // Range request — ffmpeg.wasm reads can be ranged; verify CORS survives a
+    // 206 on the endpoint the app actually uses (the CDN).
+    async function rangeTest(label, base) {
+      const url = base + PATH;
+      log(`\n[${label}] cors range bytes=0-1023 ${url}`);
+      try {
+        const res = await fetch(url, {
+          mode: "cors", cache: "no-store", headers: { Range: "bytes=0-1023" },
+        });
+        const buf = await res.arrayBuffer();
+        log(`  status ${res.status}, ${buf.byteLength} bytes`);
+        row("cors range request", label, res.status === 206 || res.ok,
+            `status ${res.status}, ${buf.byteLength} bytes`);
+      } catch (e) {
+        log(`  ERROR: ${e.name}: ${e.message}`);
+        row("cors range request", label, false, `${e.name}: ${e.message}`);
+      }
+    }
+
+    async function runAll() {
+      tbody.innerHTML = "";
+      logEl.textContent = "";
+      log("origin:", location.origin);
+      log("clip:", PATH);
+
+      // CDN is what the real app uses (CLIPS_BASE). Test it first.
+      await reachabilityTest("CDN", CDN);
+      await corsReadTest("CDN", CDN);
+      await rangeTest("CDN", CDN);
+
+      // Origin endpoint: if this PASSes but CDN FAILs, the CDN is serving a
+      // cached no-CORS response — purge the Space's CDN cache.
+      await reachabilityTest("origin (non-CDN)", ORIGIN);
+      await corsReadTest("origin (non-CDN)", ORIGIN);
+
+      log("\ndone.");
+    }
+
+    document.getElementById("run").addEventListener("click", runAll);
+    runAll();
+  </script>
+</body>
+</html>

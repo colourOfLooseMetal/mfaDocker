@@ -82,7 +82,7 @@ web/                               — browser frontend: retro Seinfeld page +
                                      CLIPS_BASE in js/clipIndex.js defaults to
                                      /lineClips/ for dev; swap for DO Spaces CDN
                                      (colm-extra-storage.nyc3.cdn.digitaloceanspaces.com/sfLines/)
-                                     in production. (index.html, themes/, js/,
+                                     in production. (seinfeldPhraseGenerator.html, themes/, js/,
                                      ffmpeg/, serve.py)
 web/README.md                      — setup, ffmpeg vendor re-fetch commands,
                                      CLIPS_BASE / CDN swap instructions

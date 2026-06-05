@@ -13,8 +13,8 @@
 // Where the .mp4 line clips live. Local for dev; in production swap for the
 // DigitalOcean Space CDN, e.g.
 //   "https://colm-extra-storage.nyc3.cdn.digitaloceanspaces.com/sfLines/"
-const CLIPS_BASE = "/lineClips/";
-const MANIFEST_URL = "/lineClips/index.json";
+const CLIPS_BASE = "https://colm-extra-storage.nyc3.cdn.digitaloceanspaces.com/sfLines/";
+const MANIFEST_URL = "./lineClipsIndex.json";
 
 // Returns { index, ngrams } where
 //   index  = { ngram: [ { url, start, end }, ... ] }  (best-first, manifest order)

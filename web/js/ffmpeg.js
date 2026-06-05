@@ -47,6 +47,16 @@ export async function getFFmpeg(onProgress) {
   return loading;
 }
 
+// Tear down the engine so the next getFFmpeg() reloads a fresh worker. A run
+// that aborts the wasm runtime leaves the worker dead; without a reset every
+// later build would fail too, turning one rare failure into "broken until
+// reload" and muddying which combo actually broke.
+export function resetFFmpeg() {
+  try { instance?.terminate(); } catch {}
+  instance = null;
+  loading = null;
+}
+
 function gapExtendArgs(inName, outName, pad) {
   const p = pad.toFixed(3);
   const fc =
@@ -87,54 +97,132 @@ function trimArgs(inName, outName, start, end) {
   ];
 }
 
+// Build a descriptive Error for a failed ffmpeg step. The worker rejects EXEC
+// with a bare *string* (its own `e.toString()`), which is exactly why the old
+// `catch (e) => e.message` surfaced "undefined". Normalize that here and staple
+// on the recent ffmpeg stderr (the real reason) plus the args, so callers can
+// log a true diagnostic and the on-screen message is meaningful.
+function ffmpegStepError(label, args, cause, logTail) {
+  const causeMsg =
+    cause == null ? "" : (cause.message || (typeof cause === "string" ? cause : String(cause)));
+  const err = new Error(causeMsg ? `${label}: ${causeMsg}` : label);
+  err.ffmpegArgs = args || null;
+  err.ffmpegLog = (logTail || []).join("\n");
+  if (cause != null) err.cause = cause;
+  return err;
+}
+
+// Tag a thrown value with the segment (line clip) that caused it, so the caller
+// can exclude that specific clip from the next retry. Returns the value so it
+// can be thrown inline.
+function withSegment(err, seg) {
+  if (err && typeof err === "object") err.segment = seg;
+  return err;
+}
+
+// Heuristic: did this rejection abort the wasm runtime (worker now dead)? Then
+// the engine must be reset before the next build can succeed.
+function isFatalAbort(cause) {
+  const s = cause == null ? "" : (cause.message || String(cause));
+  return /abort|runtimeerror|out of bounds|unreachable|memory/i.test(s);
+}
+
 // Build one mp4 Blob from an ordered list of n-gram sub-segments. Each segment
 // is { url, start, end }: the line-clip URL and the n-gram's in-clip bounds.
 // We fetch each distinct line clip once, trim every segment out of it, then
 // concat-copy. `gap` adds held-frame + silence after each segment but the last.
 export async function joinSegments(segments, { gap = 0, onLog, onProgress } = {}) {
   const ff = await getFFmpeg();
-  if (onLog) ff.on("log", ({ message }) => onLog(message));
-  if (onProgress) ff.on("progress", ({ progress }) => onProgress(progress));
 
-  const { fetchFile } = window.FFmpegUtil;
+  // Keep the last ~120 ffmpeg log lines. On failure these stderr lines are the
+  // real explanation; the rejected promise itself carries only a terse string.
+  // Registered per-call and removed in finally so listeners don't stack on the
+  // singleton across builds.
+  const logTail = [];
+  const onLogEvt = ({ message }) => {
+    logTail.push(message);
+    if (logTail.length > 120) logTail.shift();
+    onLog?.(message);
+  };
+  const onProgEvt = onProgress ? ({ progress }) => onProgress(progress) : null;
+  ff.on("log", onLogEvt);
+  if (onProgEvt) ff.on("progress", onProgEvt);
 
-  // Fetch each distinct line clip into the FS once (a clip can back several
-  // n-grams). Map url -> FS filename.
-  const srcFor = new Map();
-  let n = 0;
-  for (const seg of segments) {
-    if (!srcFor.has(seg.url)) {
-      const name = `src${n++}.mp4`;
-      await ff.writeFile(name, await fetchFile(seg.url));
-      srcFor.set(seg.url, name);
+  // Run one ffmpeg command, turning both worker rejections (wasm crash) and
+  // non-zero exit codes into a labelled, log-bearing Error. exec() resolves
+  // with the return code and does NOT throw on a non-zero exit, so a failed
+  // command would otherwise pass silently until a later step broke.
+  const run = async (label, args) => {
+    let ret;
+    try {
+      ret = await ff.exec(args);
+    } catch (cause) {
+      if (isFatalAbort(cause)) resetFFmpeg();
+      throw ffmpegStepError(`ffmpeg ${label} crashed`, args, cause, logTail);
     }
-  }
+    if (ret !== 0) throw ffmpegStepError(`ffmpeg ${label} exited ${ret}`, args, null, logTail);
+  };
 
-  try { await ff.deleteFile("out.mp4"); } catch {}
+  try {
+    const { fetchFile } = window.FFmpegUtil;
 
-  // Trim each segment, then optionally gap-extend all but the last.
-  const segNames = [];
-  for (let i = 0; i < segments.length; i++) {
-    const seg = segments[i];
-    const segName = `seg${i}.mp4`;
-    await ff.exec(trimArgs(srcFor.get(seg.url), segName, seg.start, seg.end));
-    if (gap > 0 && i < segments.length - 1) {
-      const gName = `g${i}.mp4`;
-      await ff.exec(gapExtendArgs(segName, gName, gap));
-      segNames.push(gName);
-    } else {
-      segNames.push(segName);
+    // Fetch each distinct line clip into the FS once (a clip can back several
+    // n-grams). Map url -> FS filename.
+    const srcFor = new Map();
+    let n = 0;
+    for (const seg of segments) {
+      if (!srcFor.has(seg.url)) {
+        const name = `src${n++}.mp4`;
+        let bytes;
+        try {
+          bytes = await fetchFile(seg.url);
+        } catch (cause) {
+          throw withSegment(
+            new Error(`failed to download clip ${seg.url}: ${cause?.message || cause}`), seg);
+        }
+        if (!bytes?.length) throw withSegment(new Error(`downloaded empty clip ${seg.url}`), seg);
+        await ff.writeFile(name, bytes);
+        srcFor.set(seg.url, name);
+      }
     }
+
+    try { await ff.deleteFile("out.mp4"); } catch {}
+
+    // Trim each segment, then optionally gap-extend all but the last. Tag any
+    // failure with the offending segment so the caller can exclude that clip
+    // and retry with a different one.
+    const segNames = [];
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments[i];
+      const segName = `seg${i}.mp4`;
+      try {
+        await run(
+          `trim seg ${i} (${seg.url} @ ${seg.start}-${seg.end})`,
+          trimArgs(srcFor.get(seg.url), segName, seg.start, seg.end));
+        if (gap > 0 && i < segments.length - 1) {
+          const gName = `g${i}.mp4`;
+          await run(`gap-extend seg ${i}`, gapExtendArgs(segName, gName, gap));
+          segNames.push(gName);
+        } else {
+          segNames.push(segName);
+        }
+      } catch (e) {
+        throw withSegment(e, seg);
+      }
+    }
+
+    const list = segNames.map((s) => `file '${s}'`).join("\n");
+    await ff.writeFile("list.txt", new TextEncoder().encode(list));
+    await run("concat", [
+      "-f", "concat", "-safe", "0", "-i", "list.txt",
+      "-c", "copy", "-movflags", "+faststart", "out.mp4",
+    ]);
+
+    const data = await ff.readFile("out.mp4");
+    if (!data?.length) throw ffmpegStepError("ffmpeg produced empty output", null, null, logTail);
+    return new Blob([data.buffer], { type: "video/mp4" });
+  } finally {
+    ff.off("log", onLogEvt);
+    if (onProgEvt) ff.off("progress", onProgEvt);
   }
-
-  const list = segNames.map((s) => `file '${s}'`).join("\n");
-  await ff.writeFile("list.txt", new TextEncoder().encode(list));
-  await ff.exec([
-    "-f", "concat", "-safe", "0", "-i", "list.txt",
-    "-c", "copy", "-movflags", "+faststart", "out.mp4",
-  ]);
-
-  const data = await ff.readFile("out.mp4");
-  if (!data?.length) throw new Error("ffmpeg produced empty output");
-  return new Blob([data.buffer], { type: "video/mp4" });
 }
