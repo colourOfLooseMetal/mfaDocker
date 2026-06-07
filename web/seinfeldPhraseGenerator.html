@@ -54,8 +54,14 @@
 
       <div class="row gap-row">
         <label for="gap">Gap between words:</label>
-        <input id="gap" type="range" min="0" max="0.5" step="0.01" value="0.1">
+        <input id="gap" type="range" min="0" max="0.7" step="0.01" value="0.1">
         <span id="gap-label" class="gap-label">100 ms</span>
+      </div>
+      <div class="row gap-presets">
+        <span class="gap-presets-label">Override gap:</span>
+        <button type="button" class="preset-btn" data-gap="0">No pause (0 ms)</button>
+        <button type="button" class="preset-btn" data-gap="0.3">Medium pause (300 ms)</button>
+        <button type="button" class="preset-btn" data-gap="0.7">Long pause (700 ms)</button>
       </div>
 
       <div class="row build-row">

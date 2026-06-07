@@ -13,7 +13,7 @@ const BASE = new URL("ffmpeg/", document.baseURI).href;  // .../web/ffmpeg/
 const AR = 48000;
 const FPS = 30;
 const CRF = 21;       // matches buildNgramVideo.TARGET_CRF
-const PAD_SEC = 0.02; // matches buildNgramVideo.PAD_SEC (each side of the n-gram)
+const PAD_SEC = 0;    // no padding beyond the n-gram's documented timing
 
 let instance = null;
 let loading = null;

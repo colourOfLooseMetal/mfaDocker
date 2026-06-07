@@ -90,6 +90,10 @@ button:disabled { color: #808080; cursor: default; }
 }
 
 .gap-label { font-weight: bold; min-width: 60px; }
+input[type="range"] { touch-action: pan-y; }
+.gap-presets { flex-wrap: wrap; }
+.gap-presets-label { font-weight: bold; }
+.preset-btn { font-size: 13px; padding: 3px 10px; font-weight: normal; }
 .status { font-weight: bold; color: #000080; }
 
 .result { margin-top: 14px; text-align: center; border-top: 2px groove #fff; padding-top: 12px; }

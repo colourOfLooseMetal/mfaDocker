@@ -14,6 +14,7 @@ const els = {
   clear: $("clear-btn"),
   gap: $("gap"),
   gapLabel: $("gap-label"),
+  gapPresets: document.querySelectorAll(".preset-btn"),
   build: $("build-btn"),
   status: $("status"),
   preview: $("preview"),
@@ -248,6 +249,15 @@ function init() {
     els.gapLabel.textContent = `${Math.round(els.gap.value * 1000)} ms`;
   });
   els.gapLabel.textContent = `${Math.round(els.gap.value * 1000)} ms`;
+
+  // Preset buttons set the slider directly — same default-gap mechanism, just
+  // a quicker way to land on a common value than dragging the slider.
+  els.gapPresets.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      els.gap.value = btn.dataset.gap;
+      els.gapLabel.textContent = `${Math.round(els.gap.value * 1000)} ms`;
+    });
+  });
   els.build.addEventListener("click", build);
 
   preloadEngine();

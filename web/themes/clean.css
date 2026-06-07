@@ -55,6 +55,10 @@ button:disabled { color: #aaa; cursor: default; }
 .selected .rm { border: none; background: transparent; color: #c0392b; padding: 0 0 0 6px; }
 
 .gap-label { color: #555; min-width: 60px; }
+input[type="range"] { touch-action: pan-y; }
+.gap-presets { flex-wrap: wrap; }
+.gap-presets-label { color: #555; font-size: 14px; }
+.preset-btn { font-size: 13px; padding: 4px 10px; }
 .status { color: #555; font-size: 14px; }
 
 .result { margin-top: 18px; text-align: center; border-top: 1px solid #eee; padding-top: 16px; }
