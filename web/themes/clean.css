@@ -53,6 +53,9 @@ button:disabled { color: #aaa; cursor: default; }
   border-radius: 3px; padding: 3px 8px; margin: 3px; font-size: 15px;
 }
 .selected .rm { border: none; background: transparent; color: #c0392b; padding: 0 0 0 6px; }
+.selected li.gap-token {
+  background: #eef2f7; border: 1px dashed #99a; color: #556; font-style: italic;
+}
 
 .gap-label { color: #555; min-width: 60px; }
 input[type="range"] { touch-action: pan-y; }

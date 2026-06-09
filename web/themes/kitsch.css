@@ -88,6 +88,9 @@ button:disabled { color: #808080; cursor: default; }
   border: none; background: transparent; color: #b00; font-weight: bold;
   padding: 0 0 0 6px; font-size: 14px;
 }
+.selected li.gap-token {
+  background: #cce0ff; border: 2px dashed #6688bb; color: #224; font-style: italic;
+}
 
 .gap-label { font-weight: bold; min-width: 60px; }
 input[type="range"] { touch-action: pan-y; }

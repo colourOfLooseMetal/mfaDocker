@@ -24,7 +24,11 @@ const els = {
 
 let INDEX = {};
 let NGRAMS = [];
-const selected = []; // array of chosen n-grams (in order)
+// Ordered list of items the phrase is built from. Each item is either
+// { kind: "ngram", text } or { kind: "gap", sec } — a custom-pause token
+// inserted between two n-grams that overrides the default slider gap for
+// just that boundary.
+const selected = [];
 
 // Clips that crashed ffmpeg.wasm (RuntimeError / memory access out of bounds).
 // WASM crashes are deterministic — the same clip will always crash. Unlike
@@ -40,9 +44,9 @@ function isWasmCrash(e) {
 // ---- engine preload (cache the 31MB before first build) ----
 async function preloadEngine() {
   try {
-    els.engine.textContent = "loading video engine (~31 MB, one-time)…";
+    els.engine.textContent = "loading...";
     await getFFmpeg();
-    els.engine.textContent = "video engine ready ✓";
+    els.engine.textContent = "Ready!";
   } catch (e) {
     els.engine.textContent = `engine failed to load: ${e.message}`;
   }
@@ -84,18 +88,31 @@ function addNgram(ngram) {
     els.status.textContent = `unknown word/phrase: ${ngram}`;
     return;
   }
-  selected.push(ngram);
+  selected.push({ kind: "ngram", text: ngram });
   renderSelected();
   els.input.value = "";
   refreshSuggestions("");
   els.input.focus();
 }
 
+// Append a custom-pause token. It only takes effect once it sits between two
+// n-grams (see planSegments) — a leading/trailing/duplicate token is simply
+// ignored at build time, so we don't need to validate placement here.
+function addGapToken(sec) {
+  selected.push({ kind: "gap", sec });
+  renderSelected();
+}
+
 function renderSelected() {
   els.selected.innerHTML = "";
-  selected.forEach((ng, i) => {
+  selected.forEach((item, i) => {
     const li = document.createElement("li");
-    li.textContent = ng;
+    if (item.kind === "gap") {
+      li.className = "gap-token";
+      li.textContent = `⏸ ${Math.round(item.sec * 1000)} ms`;
+    } else {
+      li.textContent = item.text;
+    }
     const x = document.createElement("button");
     x.textContent = "×";
     x.className = "rm";
@@ -104,18 +121,39 @@ function renderSelected() {
     li.appendChild(x);
     els.selected.appendChild(li);
   });
-  els.build.disabled = selected.length === 0;
+  els.build.disabled = !selected.some((item) => item.kind === "ngram");
+}
+
+// Walk the ordered selection, splitting it into the n-gram list ffmpeg needs
+// plus a per-boundary gap (seconds) to apply between each consecutive pair.
+// A gap token sets the boundary immediately following it; tokens with no
+// n-gram on both sides (leading, trailing, back-to-back) are dropped. Any
+// boundary without a token falls back to the slider's default gap.
+function planSegments(items, defaultGap) {
+  const ngrams = [];
+  const gaps = [];
+  let pending = null;
+  for (const item of items) {
+    if (item.kind === "gap") {
+      pending = item.sec;
+      continue;
+    }
+    if (ngrams.length > 0) gaps.push(pending != null ? pending : defaultGap);
+    ngrams.push(item.text);
+    pending = null;
+  }
+  return { ngrams, gaps };
 }
 
 // ---- build ----
 async function build() {
-  if (!selected.length) return;
-  const ngrams = [...selected];
-  const gap = parseFloat(els.gap.value);
+  const defaultGap = parseFloat(els.gap.value);
+  const { ngrams, gaps } = planSegments(selected, defaultGap);
+  if (!ngrams.length) return;
   setBusy(true);
   els.status.textContent = "building…";
   try {
-    const blob = await buildWithRetry(ngrams, gap);
+    const blob = await buildWithRetry(ngrams, gaps);
     const url = URL.createObjectURL(blob);
     els.preview.src = url;
     els.download.href = url;
@@ -145,7 +183,7 @@ async function build() {
 // attempt succeeds (send those to fix/exclude the source clip).
 const MAX_BUILD_ATTEMPTS = 3;
 
-async function buildWithRetry(ngrams, gap) {
+async function buildWithRetry(ngrams, gaps) {
   const failed = new Set(); // clip urls proven bad this build; never re-picked
   let lastErr;
   for (let attempt = 1; attempt <= MAX_BUILD_ATTEMPTS; attempt++) {
@@ -153,7 +191,7 @@ async function buildWithRetry(ngrams, gap) {
     console.info(`[build] attempt ${attempt}/${MAX_BUILD_ATTEMPTS}`, "segments:", segments);
     try {
       return await joinSegments(segments, {
-        gap,
+        gaps,
         // ffmpeg stderr → console at the "verbose" level (hidden by default;
         // turn on "Verbose" in the console level filter to watch a build live).
         onLog: (m) => console.debug("[ffmpeg]", m),
@@ -250,13 +288,11 @@ function init() {
   });
   els.gapLabel.textContent = `${Math.round(els.gap.value * 1000)} ms`;
 
-  // Preset buttons set the slider directly — same default-gap mechanism, just
-  // a quicker way to land on a common value than dragging the slider.
+  // Preset buttons append a custom-pause token to the phrase — it overrides
+  // the default slider gap for just the boundary it lands on, so a single
+  // phrase can mix the default gap with one-off pauses.
   els.gapPresets.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      els.gap.value = btn.dataset.gap;
-      els.gapLabel.textContent = `${Math.round(els.gap.value * 1000)} ms`;
-    });
+    btn.addEventListener("click", () => addGapToken(parseFloat(btn.dataset.gap)));
   });
   els.build.addEventListener("click", build);
 

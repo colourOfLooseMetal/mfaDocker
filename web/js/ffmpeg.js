@@ -130,8 +130,10 @@ function isFatalAbort(cause) {
 // Build one mp4 Blob from an ordered list of n-gram sub-segments. Each segment
 // is { url, start, end }: the line-clip URL and the n-gram's in-clip bounds.
 // We fetch each distinct line clip once, trim every segment out of it, then
-// concat-copy. `gap` adds held-frame + silence after each segment but the last.
-export async function joinSegments(segments, { gap = 0, onLog, onProgress } = {}) {
+// concat-copy. `gaps[i]` adds held-frame + silence after segment i (for
+// i < segments.length - 1) — one entry per boundary, mixing the slider's
+// default with any custom-pause tokens the user inserted.
+export async function joinSegments(segments, { gaps = [], onLog, onProgress } = {}) {
   const ff = await getFFmpeg();
 
   // Keep the last ~120 ffmpeg log lines. On failure these stderr lines are the
@@ -199,7 +201,8 @@ export async function joinSegments(segments, { gap = 0, onLog, onProgress } = {}
         await run(
           `trim seg ${i} (${seg.url} @ ${seg.start}-${seg.end})`,
           trimArgs(srcFor.get(seg.url), segName, seg.start, seg.end));
-        if (gap > 0 && i < segments.length - 1) {
+        const gap = i < segments.length - 1 ? (gaps[i] || 0) : 0;
+        if (gap > 0) {
           const gName = `g${i}.mp4`;
           await run(`gap-extend seg ${i}`, gapExtendArgs(segName, gName, gap));
           segNames.push(gName);
