@@ -6,7 +6,7 @@ renamed episodes to be s##e##
 extracted audio from each episode as a .wav file
 
 extracted subtitle text from each episode as a .srt file
-<img src="devLogPics/srtExample.png" alt="" style="display: inline-block; height: 11.25rem; width: auto; vertical-align: text-bottom; margin: 0 0.25rem;" />
+<img src="devLogPics/srtExample.png" alt="" style="display: inline-block; height: 18.25rem; width: auto; vertical-align: text-bottom; margin: 0 0.25rem;" />
 
 
 then from each srt file only the text was extracted and placed into a txt file for each episode, along with removing text which was not spoken words
@@ -42,7 +42,7 @@ this originally kind of failed and I realized the 23 minute wavs with the blocks
 thankfully mfa can also use textgrids, which I could use the subtitle timing info for
 
 they look like this
-<img src="devLogPics/textgridExample.png" alt="" style="display: inline-block; height: 11.25rem; width: auto; vertical-align: text-bottom; margin: 0 0.25rem;" />
+<img src="devLogPics/textgridExample.png" alt="" style="display: inline-block; height: 18.25rem; width: auto; vertical-align: text-bottom; margin: 0 0.25rem;" />
 
 #then went on to mess around with the mfa docker more 
 
@@ -54,7 +54,7 @@ mfa validate /data/Seinfeld/Season1 english_us_mfa english_mfa --output_director
 
 around this point I realized from one of the output files from validate that a bunch of words weren't working since they werent in the english_us_mfa dictionary, this included words
 with dashes but also included numbers which were given as actual numbers like 25 not twenty five and therefore didnt work with the model
-<img src="devLogPics/wordsNotFound.png" alt="" style="display: inline-block; height: 11.25rem; width: auto; vertical-align: text-bottom; margin: 0 0.25rem;" />
+<img src="devLogPics/wordsNotFound.png" alt="" style="display: inline-block; height: 18.25rem; width: auto; vertical-align: text-bottom; margin: 0 0.25rem;" />
 
 
 thankfully there is a numbers to words python library that I was able to use to help with this, didnt get everything but helped a lot.
@@ -69,11 +69,11 @@ and then finally used this command to run on all episode .wav and .textgrid file
 
 mfa align /data/Seinfeld/allWavAndTG english_us_mfa /data/models/seinfeld_adapted.zip /data/output_final --output_format json --g2p_model_path english_us_arpa --fine_tune --clean
 
-<img src="devLogPics/mfaAlignDemoRun.png" alt="" style="display: inline-block; height: 15.25rem; width: auto; vertical-align: text-bottom; margin: 0 0.25rem;" />
+<img src="devLogPics/mfaAlignDemoRun.png" alt="" style="display: inline-block; height: 18.25rem; width: auto; vertical-align: text-bottom; margin: 0 0.25rem;" />
 
 the seinfeldDemo folder contained these files
 
-<img src="devLogPics/seinfeldDemoFolder.png" alt="" style="display: inline-block; height: 11.25rem; width: auto; vertical-align: text-bottom; margin: 0 0.25rem;" />
+<img src="devLogPics/seinfeldDemoFolder.png" alt="" style="display: inline-block; height: 18.25rem; width: auto; vertical-align: text-bottom; margin: 0 0.25rem;" />
 
 
 and then a json file like this for every .wav and .textgrid I had (one for each episode)
@@ -94,7 +94,7 @@ At this point I realized although 94% were "successfully aligned" a lot of words
 especially ones that are spoken quickly and fall in the middle of sentences dont cut out well, there were also many cases where alignment wasn't perfect
 
 
-alignment_analysis.csv had some other stats but after checking them out they didnt really give a good look at how clear a cut word was
+alignment_analysis.csv had some other stats but after checking them out they didnt really give a good look at how clearly audible a cut word was
 
 
 To try to sort the good cuts from the bad ones I used a wav2vec2 model (a speech recognition model from facebook/meta) to score each aligned word.
@@ -107,23 +107,20 @@ that helped a lot with word quality but I found single words very rarely cut cle
 
 
 so I extended the approach to use a sliding n-grams window of 1 to 6 words within a single subtitle line. rather than just scoring words, I now score every phrase window within each line. 
-this meant the sentence builder could now pick longer, naturally-flowing phrases from the show, which made the output much less robotic.
+this meant the sentence builder could now pick longer, naturally-flowing sets of words and combine them into a sentence
 
-at this point I started thinking about putting it on the web, and ran into a pretty immediate problem: each episode's wav file is around 40–60 MB, and the mkv is larger still.
-having the browser download a whole episode just to play a 2-second clip is not really viable. I needed to pre-cut the audio into smaller pieces.
+did some culling to only pick the best most clear clips based on running wav2vec process on all the ngrams audio. if a ngram only occurs once we are quite leanient about keeping it but if it occurs lots we keep the best ones only.
 
-the solution was to shift the whole pipeline to work on subtitle lines rather than full episodes. instead of storing timing info relative to the episode start, I cut each
-subtitle line out as its own short mp4 clip with karaoke-style word-highlight captions burned in, then stored the clip's start and end times relative to the beginning of
-that line file. I ended up with a flat folder of thousands of short clips and an inverted index mapping each candidate n-gram to every clip it appears in, along with
-the in-clip timestamps for trimming. the web build loads the index, picks the best clip for each phrase the user typed, trims it client-side using ffmpeg.wasm (ffmpeg
-compiled to webassembly so it runs in the browser), and stitches the pieces together — no server-side processing needed.
+at this point I started thinking about putting it on the web, and ran into the issue that each episode's mkv is super big.
 
-to actually host it I uploaded all the line clips to a Digital Ocean Spaces bucket (essentially S3-compatible object storage) and deployed the web frontend to a Digital Ocean
-droplet. the frontend is a static page — seinfeldPhraseGenerator.html — that loads the clip index from the CDN and does all the video assembly in the browser.
+having the browser download a whole episode just to play a 2-second clip would be dumb
 
-then a lot of testing. the ffmpeg.wasm pipeline in particular took a while to get right — clip trimming, audio sync, making sure clips concatenated cleanly, handling
-CORS correctly between the droplet and the Spaces CDN. there were a lot of edge cases.
+cut each episode into subtitle line clips with the individual words hard subbed for their timeframes and adjusted timing info which was relative to the episode start, to be indexed to a line clip and the time it started and ended for that line clip instead of from episode start
 
-added a retro Seinfeld-themed UI with some funky themes because if you're going to make a Seinfeld phrase generator it should at least look the part.
 
-and then finally sent some deeply unhinged shitpost videos to people to make sure it all worked end to end.
+use an index that maps the ngrams to their line clip and timing
+load trim and combine the n gram subclips client-side using ffmpeg.wasm (ffmpeg
+compiled to webassembly so it runs in the browser)
+
+
+added a retro Seinfeld-themed UI
