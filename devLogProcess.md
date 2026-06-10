@@ -1,9 +1,14 @@
 torrented seinfeld all 9 seasons
+
 use python scripts to
 renamed episodes to be s##e##
+
 extracted audio from each episode as a .wav file
+
 extracted subtitle text from each episode as a .srt file
-<img src="devLogPics/srtExample.png" alt="" style="display: inline-block; height: 1.25rem; width: auto; vertical-align: text-bottom; margin: 0 0.25rem;" />
+<img src="devLogPics/srtExample.png" alt="" style="display: inline-block; height: 11.25rem; width: auto; vertical-align: text-bottom; margin: 0 0.25rem;" />
+
+
 then from each srt file only the text was extracted and placed into a txt file for each episode, along with removing text which was not spoken words
 such as [audience laughter] and a bunch of other stuff enclosed in square brackets
 
@@ -34,8 +39,9 @@ mfa align /data english_us_mfa english_mfa /data/output --output_format json
 
 this originally kind of failed and I realized the 23 minute wavs with the blocks of text weren't working that well.
 thankfully mfa can also use textgrids, which I could use the subtitle timing info for
+
 they look like this
-<img src="devLogPics/textgridExample.png" alt="" style="display: inline-block; height: 1.25rem; width: auto; vertical-align: text-bottom; margin: 0 0.25rem;" />
+<img src="devLogPics/textgridExample.png" alt="" style="display: inline-block; height: 11.25rem; width: auto; vertical-align: text-bottom; margin: 0 0.25rem;" />
 
 #then went on to mess around with the mfa docker more 
 #honestly still not 100% sure what validate does, but it did output some interesting information about words that weren't compatible for being aligned and led me to start using 
