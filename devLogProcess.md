@@ -118,9 +118,16 @@ having the browser download a whole episode just to play a 2-second clip would b
 cut each episode into subtitle line clips with the individual words hard subbed for their timeframes and adjusted timing info which was relative to the episode start, to be indexed to a line clip and the time it started and ended for that line clip instead of from episode start
 
 
-use an index that maps the ngrams to their line clip and timing
+use an index that maps the ngrams to their line clip and timing,
 load trim and combine the n gram subclips client-side using ffmpeg.wasm (ffmpeg
 compiled to webassembly so it runs in the browser)
 
 
 added a retro Seinfeld-themed UI
+
+
+
+Todo and hindsight 
+a sliding window for 1-3 words/ngrams might have been better, also having a way to show in the video maker if a words quality is low but it was kept because it was one of a kind might be nice but don't want to store more info per word 
+
+
