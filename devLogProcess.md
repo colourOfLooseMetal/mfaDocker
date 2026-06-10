@@ -126,7 +126,7 @@ compiled to webassembly so it runs in the browser)
 added a retro Seinfeld-themed UI
 
 
-added the options to set unique between word timings so you could swear by going "she" add 0ms no pause then "it" and can add longer pauses with it. ngrams without a pause inserted have the default pause
+added the options to set unique between word timings so you could swear by going "she" add 0ms no pause then "it" and can add longer pauses with it. ngrams without a pause inserted have the default pause gap set by slider
 
 
 
