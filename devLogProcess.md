@@ -126,6 +126,9 @@ compiled to webassembly so it runs in the browser)
 added a retro Seinfeld-themed UI
 
 
+added the options to set unique between word timings so you could swear by going "she" add 0ms no pause then "it" and can add longer pauses with it. ngrams without a pause inserted have the default pause
+
+
 
 Todo and hindsight 
 a sliding window for 1-3 words/ngrams might have been better, also having a way to show in the video maker if a words quality is low but it was kept because it was one of a kind might be nice but don't want to store more info per word 
